@@ -75,6 +75,15 @@ namespace EffectiveRentCalculator
         /// <returns></returns>
         public static double ProgressiveFutureValue(double a, double i, double r, int n)
         {
+            if (n < 0)
+                throw new ArgumentOutOfRangeException(string.Format("{0} must be greater than or equal to zero", nameof(n)));
+
+            if (i < 0.0)
+                throw new ArgumentOutOfRangeException(string.Format("{0} must be greater than or equal to zero", nameof(i)));
+
+            if (r < 0.0)
+                throw new ArgumentOutOfRangeException(string.Format("{0} must be greater than or equal to zero", nameof(r)));
+
             return Functions.Sum(a * Math.Pow(1.0 + r, n - 1), (1.0 + i) / (1.0 + r), n);
         }
     }
