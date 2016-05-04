@@ -17,11 +17,8 @@ namespace EffectiveRentCalculator
         /// <returns></returns>
         public static double Sum(double a, double r, int n)
         {
-            if (n < 0)
-                throw new ArgumentOutOfRangeException(string.Format("{0} must be greater than or equal to zero", nameof(n)));
-
-            if (r < 0.0)
-                throw new ArgumentOutOfRangeException(string.Format("{0} must be greater than or equal to zero", nameof(r)));
+            Functions.VerifyNotNegative(nameof(n), n);
+            Functions.VerifyNotNegative(nameof(r), r);
 
             if (r == 1.0)
                 return a * n;
@@ -38,11 +35,8 @@ namespace EffectiveRentCalculator
         /// <returns></returns>
         public static double Payment(double p, double i, int n)
         {
-            if (n <= 0)
-                throw new ArgumentOutOfRangeException(string.Format("{0} must be greater than zero", nameof(n)));
-
-            if (i <= 0.0)
-                throw new ArgumentOutOfRangeException(string.Format("{0} must be greater than zero", nameof(i)));
+            Functions.VerifyGreaterThanZero(nameof(n), n);
+            Functions.VerifyNotNegative(nameof(i), i);
 
             return p * i / (1 - Math.Pow(1 + i, -n));
         }
@@ -56,11 +50,8 @@ namespace EffectiveRentCalculator
         /// <returns></returns>
         public static double FutureValue(double a, double i, int n)
         {
-            if (n < 0)
-                throw new ArgumentOutOfRangeException(string.Format("{0} must be greater than or equal to zero", nameof(n)));
-
-            if (i < 0.0)
-                throw new ArgumentOutOfRangeException(string.Format("{0} must be greater than or equal to zero", nameof(i)));
+            Functions.VerifyGreaterThanZero(nameof(n), n);
+            Functions.VerifyNotNegative(nameof(i), i);
 
             return a * Math.Pow(1 + i, n);
         }
@@ -75,16 +66,40 @@ namespace EffectiveRentCalculator
         /// <returns></returns>
         public static double ProgressiveFutureValue(double a, double i, double r, int n)
         {
-            if (n < 0)
-                throw new ArgumentOutOfRangeException(string.Format("{0} must be greater than or equal to zero", nameof(n)));
-
-            if (i < 0.0)
-                throw new ArgumentOutOfRangeException(string.Format("{0} must be greater than or equal to zero", nameof(i)));
-
-            if (r < 0.0)
-                throw new ArgumentOutOfRangeException(string.Format("{0} must be greater than or equal to zero", nameof(r)));
+            Functions.VerifyGreaterThanZero(nameof(n), n);
+            Functions.VerifyNotNegative(nameof(i), i);
+            Functions.VerifyNotNegative(nameof(r), r);
 
             return Functions.Sum(a * Math.Pow(1.0 + r, n - 1), (1.0 + i) / (1.0 + r), n);
+        }
+
+        public static double ToMonthlyRate(double annualRate)
+        {
+            return Math.Pow(annualRate + 1.0, 1.0 / 12) - 1.0;
+        }
+
+        private static void VerifyGreaterThanZero(string name, double value)
+        {
+            if (value <= 0.0)
+                throw new ArgumentOutOfRangeException(string.Format("{0} must be greater than zero. Value: {1}", name, value));
+        }
+
+        private static void VerifyNotNegative(string name, double value)
+        {
+            if (value < 0.0)
+                throw new ArgumentOutOfRangeException(string.Format("{0} cannot be negative. Value: {1}", name, value));
+        }
+
+        private static void VerifyGreaterThanZero(string name, int value)
+        {
+            if (value <= 0.0)
+                throw new ArgumentOutOfRangeException(string.Format("{0} must be greater than zero. Value: {1}", name, value));
+        }
+
+        private static void VerifyNotNegative(string name, int value)
+        {
+            if (value < 0)
+                throw new ArgumentOutOfRangeException(string.Format("{0} cannot be negative. Value: {1}", name, value));
         }
     }
 }
