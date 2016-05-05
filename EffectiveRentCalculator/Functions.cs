@@ -17,8 +17,8 @@ namespace EffectiveRentCalculator
         /// <returns></returns>
         public static double Sum(double a, double r, int n)
         {
-            Functions.VerifyNotNegative(nameof(n), n);
-            Functions.VerifyNotNegative(nameof(r), r);
+            Utilities.VerifyNotNegative(nameof(n), n);
+            Utilities.VerifyNotNegative(nameof(r), r);
 
             if (r == 1.0)
                 return a * n;
@@ -35,8 +35,8 @@ namespace EffectiveRentCalculator
         /// <returns></returns>
         public static double Payment(double p, double i, int n)
         {
-            Functions.VerifyGreaterThanZero(nameof(n), n);
-            Functions.VerifyNotNegative(nameof(i), i);
+            Utilities.VerifyGreaterThanZero(nameof(n), n);
+            Utilities.VerifyNotNegative(nameof(i), i);
 
             return p * i / (1 - Math.Pow(1 + i, -n));
         }
@@ -50,8 +50,8 @@ namespace EffectiveRentCalculator
         /// <returns></returns>
         public static double FutureValue(double a, double i, int n)
         {
-            Functions.VerifyGreaterThanZero(nameof(n), n);
-            Functions.VerifyNotNegative(nameof(i), i);
+            Utilities.VerifyGreaterThanZero(nameof(n), n);
+            Utilities.VerifyNotNegative(nameof(i), i);
 
             return a * Math.Pow(1 + i, n);
         }
@@ -66,40 +66,34 @@ namespace EffectiveRentCalculator
         /// <returns></returns>
         public static double ProgressiveFutureValue(double a, double i, double r, int n)
         {
-            Functions.VerifyGreaterThanZero(nameof(n), n);
-            Functions.VerifyNotNegative(nameof(i), i);
-            Functions.VerifyNotNegative(nameof(r), r);
+            Utilities.VerifyGreaterThanZero(nameof(n), n);
+            Utilities.VerifyNotNegative(nameof(i), i);
+            Utilities.VerifyNotNegative(nameof(r), r);
 
             return Functions.Sum(a * Math.Pow(1.0 + r, n - 1), (1.0 + i) / (1.0 + r), n);
         }
 
+        /// <summary>
+        /// Converts an annual interest rate to a monthly interest rate.
+        /// </summary>
+        /// <param name="annualRate">The annual interest rate.</param>
+        /// <returns></returns>
         public static double ToMonthlyRate(double annualRate)
         {
             return Math.Pow(annualRate + 1.0, 1.0 / 12) - 1.0;
         }
 
-        private static void VerifyGreaterThanZero(string name, double value)
+        /// <summary>
+        /// Calculates the effective monthly expense based on a total opportunity cost.
+        /// </summary>
+        /// <param name="opportunityCost">The total opportunity cost.</param>
+        /// <param name="inflationRate">The annual rate at which monthly expenses increase.</param>
+        /// <param name="returnOnInvestments">The annual rate at which investments increase.</param>
+        /// <param name="n">The number of payments to be made.</param>
+        /// <returns></returns>
+        public static double EffectiveMonthlyCost(double opportunityCost, double inflationRate, double returnOnInvestments, int n)
         {
-            if (value <= 0.0)
-                throw new ArgumentOutOfRangeException(string.Format("{0} must be greater than zero. Value: {1}", name, value));
-        }
-
-        private static void VerifyNotNegative(string name, double value)
-        {
-            if (value < 0.0)
-                throw new ArgumentOutOfRangeException(string.Format("{0} cannot be negative. Value: {1}", name, value));
-        }
-
-        private static void VerifyGreaterThanZero(string name, int value)
-        {
-            if (value <= 0.0)
-                throw new ArgumentOutOfRangeException(string.Format("{0} must be greater than zero. Value: {1}", name, value));
-        }
-
-        private static void VerifyNotNegative(string name, int value)
-        {
-            if (value < 0)
-                throw new ArgumentOutOfRangeException(string.Format("{0} cannot be negative. Value: {1}", name, value));
+            return opportunityCost / (Functions.ProgressiveFutureValue(1.0 + inflationRate, inflationRate, returnOnInvestments, n));
         }
     }
 }

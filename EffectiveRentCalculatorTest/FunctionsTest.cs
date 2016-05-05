@@ -116,5 +116,56 @@ namespace EffectiveRentCalculatorTest
                 }
             }
         }
+
+        [TestMethod]
+        public void TestMonthlyRate()
+        {
+            for(int i = 0; i <= 1.0; i++)
+            {
+                double monthlyRate = Functions.ToMonthlyRate(i);
+                double value = 1.0;
+
+                for (int j = 0; j < 12; j++)
+                    value *= monthlyRate + 1.0;
+
+                double annualRate = value - 1.0;
+
+                if (i == 0)
+                    Assert.IsTrue(annualRate == 0);
+                else
+                    Assert.IsTrue(Math.Abs(annualRate / i - 1.0) < 1e-9);
+            }
+        }
+
+        [TestMethod]
+        public void EffectiveMonthlyCost()
+        {
+            for (double a = 0; a < 100; a++)
+            {
+                for (double i = 0.0; i < 0.2; i += 0.05)
+                {
+                    for (double r = 0.0; r < 0.2; r += 0.05)
+                    {
+                        for (int n = 1; n < 50; n++)
+                        {
+                            double monthlyCost = Functions.EffectiveMonthlyCost(a, i, r, n);
+                            double opportunityCost = 0;
+
+                            for (int j = 1; j <= n; j++)
+                            {
+                                opportunityCost *= (1.0 + r);
+                                monthlyCost *= 1.0 + i;
+                                opportunityCost += monthlyCost;
+                            }
+
+                            if (a == 0)
+                                Assert.IsTrue(opportunityCost == 0);
+                            else
+                                Assert.IsTrue(Math.Abs(opportunityCost / a - 1.0) < 1e-9);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

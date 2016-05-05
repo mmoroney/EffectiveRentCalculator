@@ -22,6 +22,18 @@ namespace EffectiveRentCalculator
             double returnOnInvestments,
             int timeHorizon)
         {
+            Utilities.VerifyNotNegative(nameof(purchasePrice), purchasePrice);
+            Utilities.VerifyNotNegative(nameof(closingCosts), closingCosts);
+            Utilities.VerifyNotNegative(nameof(monthlyExpenses), monthlyExpenses);
+            Utilities.VerifyNotNegative(nameof(propertyTaxRate), propertyTaxRate);
+            Utilities.VerifyNotNegative(nameof(appreciationRate), appreciationRate);
+            Utilities.VerifyNotNegative(nameof(interestRate), interestRate);
+            Utilities.VerifyGreaterThanZero(nameof(term), term);
+            Utilities.VerifyNotNegative(nameof(marginalTaxRate), marginalTaxRate);
+            Utilities.VerifyNotNegative(nameof(inflationRate), inflationRate);
+            Utilities.VerifyNotNegative(nameof(returnOnInvestments), returnOnInvestments);
+            Utilities.VerifyGreaterThanZero(nameof(timeHorizon), timeHorizon);
+
             double downpayment = purchasePrice * percentDown;
             double principal = purchasePrice - downpayment;
             double mortgagePayment = Functions.Payment(principal, Functions.ToMonthlyRate(interestRate), term * 12);
@@ -35,7 +47,7 @@ namespace EffectiveRentCalculator
             totalOpportunityCost -= HousePurchase.HouseValue(purchasePrice, appreciationRate, timeHorizon);
             totalOpportunityCost -= HousePurchase.TaxRefundValue(principal, mortgagePayment, interestRate, term, marginalTaxRate, returnOnInvestments, timeHorizon);
 
-            return HousePurchase.EffectiveMonthlyCost(totalOpportunityCost, inflationRate, returnOnInvestments, timeHorizon);
+            return Functions.EffectiveMonthlyCost(totalOpportunityCost, Functions.ToMonthlyRate(inflationRate), Functions.ToMonthlyRate(returnOnInvestments), 12 * timeHorizon);
         }
 
         private static double DownpaymentOpportunityCost(double downpayment, double returnOnInvestments, int timeHorizon)
@@ -90,11 +102,6 @@ namespace EffectiveRentCalculator
                 value = Functions.FutureValue(value, returnOnInvestments, timeHorizon - term);
 
             return value;
-        }
-
-        private static double EffectiveMonthlyCost(double opportunityCost, double inflationRate, double returnOnInvestments, int timeHorizon)
-        {
-            return opportunityCost / (Functions.ProgressiveFutureValue(1.0 + Functions.ToMonthlyRate(inflationRate), Functions.ToMonthlyRate(inflationRate), Functions.ToMonthlyRate(returnOnInvestments), 12 * timeHorizon));
         }
     }
 }
